@@ -2,72 +2,46 @@ const path = require('path');
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 
 module.exports = {
-    "entry": {
-        "myappcss": "./less/index.less",
+    entry: {
+        myappcss: "./less/index.less",
     },
-    "mode": "development",
-    "devtool": "eval-cheap-module-source-map",
-    "target": "web",
-    "output": {
-        "path": path.resolve("../myapp/static/myapp"),
-        "filename": "js/[name].min.js",
-        "chunkFilename": "[name].bundle.js",
-        "library": "datakortetno",
-        "libraryTarget": "var",
-        "libraryExport": "default"
+    mode: "development",
+    devtool: false,
+    output: {
+        path: path.resolve("./myapp/static/myapp/"),
     },
-
-    "module": {
-        "rules": [
-            {
-                "test": /\.(png|jpg)$/,
-                "use": [
-                    {
-                        "loader": "file-loader",
-                        "options": {
-                            "name": "[path][name].[ext]",
-                            //"context": "."
-                        }
+    plugins: [
+        new MiniCssExtractPlugin({
+            filename: 'css/[name].[contenthash].css',
+        }),
+    ],
+    module: {
+        rules: [{
+                test: /\.(png|jpg)$/,
+                use: [{
+                    loader: "file-loader",
+                    options: {
+                        name: "[path][name].[ext]",
+                        context: path.resolve('./less')
                     }
-                ]
-            },
-            {
-                "test": /\.less$/,
-                "use": [
-                    {
-                        "loader": MiniCssExtractPlugin.loader,
-                        "options": {
-                            "publicPath": "../"
+                }]
+            }, {
+                test: /\.less$/,
+                use: [{
+                        loader: MiniCssExtractPlugin.loader,
+                        options: {
+                            publicPath: "../"
+                        }
+                    }, {
+                        loader: "css-loader",
+                        options: {
+                            // url: false,
+                            importLoaders: 1
                         }
                     },
-                    {
-                        "loader": "css-loader",
-                        "options": {
-                            "url": false,
-                            "sourceMap": true,
-                            "importLoaders": 2
-                        }
-                    },
-                    {
-                        "loader": "postcss-loader"
-                    },
-                    {
-                        "loader": "less-loader",
-                        "options": {
-                            "sourceMap": true,
-                            "lessOptions": {
-                                "rewriteUrls": "all"
-                            }
-                        }
-                    }
+                    'less-loader'
                 ]
             }
         ]
-    },
-    "plugins": [
-        new MiniCssExtractPlugin({
-            filename: 'css/[name].[contenthash].css',
-            chunkFilename: "[id].css"
-        }),
-    ]
+    }
 }
